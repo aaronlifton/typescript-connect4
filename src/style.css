@@ -1,10 +1,14 @@
 #game {
   -webkit-user-select: none;
 }
-#startOverBtn {
+.btn {
   font-size: 1em;
   background: white;
   border: 1px solid black;
   padding: 0.5em;
+  margin-right: 1em;
   -webkit-user-select: none;
+}
+.btn.disabled {
+  background: #ccc;
 }

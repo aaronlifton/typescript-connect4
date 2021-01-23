@@ -1,24 +1,8 @@
+import { Cell, Player } from './types'
+import { setup } from './interface'
 import { checkPositionForWin } from './winChecks'
 import * as d3 from 'd3-ease'
 import './style.css'
-
-const container = document.createElement('div')
-container.id = 'game'
-
-const el = document.createElement('canvas')
-el.id  = 'canvas'
-container.appendChild(el)
-document.body.appendChild(container)
-
-const div = document.createElement('div')
-const btn = document.createElement('button')
-btn.id  = 'startOverBtn'
-btn.innerHTML = 'Start Over'
-div.appendChild(btn)
-document.body.appendChild(div)
-
-type Cell  = "A" | "B" | "X" | null
-type Player = "A" | "B"
 class Game {
   canvas: HTMLCanvasElement
   context: CanvasRenderingContext2D
@@ -28,6 +12,7 @@ class Game {
   width = this.cellsX * this.cellSize
   height = this.cellsY * this.cellSize
   grid: Cell[][]
+  debugGrid: boolean[][]
   highlighted: boolean[][]
   winner: Player
   currentPlayer: Player = "A"
@@ -38,6 +23,7 @@ class Game {
   dropAnimationY = 0
   lastDrop: { clickCol: number, clickRow: number, row: number, col: number, player: Player }
   canAcceptInput = true
+  debug = false
 
   constructor() {
     this.canvas = document.getElementById('canvas') as HTMLCanvasElement
@@ -50,12 +36,15 @@ class Game {
   setupGrid() {
     this.grid = []
     this.highlighted = []
-    for(let row = 0; row < this.cellsY; row++) {
+    this.debugGrid = []
+    for (let row = 0; row < this.cellsY; row++) {
       this.grid.push([])
       this.highlighted.push([])
-      for(let col = 0; col < this.cellsX; col++) {
+      this.debugGrid.push([])
+      for (let col = 0; col < this.cellsX; col++) {
         this.grid[this.grid.length - 1].push(null)
         this.highlighted[this.highlighted.length - 1].push(false)
+        this.debugGrid[this.debugGrid.length - 1].push(false)
       }
     }
   }
@@ -96,7 +85,7 @@ class Game {
 
   handleBoxClick(row: number, col: number) {
     const player = this.currentPlayer
-    const {row: placedRow, col: placedCol} = this.dropPiece(col)
+    const { row: placedRow, col: placedCol } = this.dropPiece(col)
     if (typeof row == 'undefined' || typeof col == 'undefined') return
 
     this.lastDrop = {
@@ -110,8 +99,8 @@ class Game {
   }
 
   clearHighlights() {
-    for(let row = 0; row < this.cellsY; row++) {
-      for(let col = 0; col < this.cellsY; col++) {
+    for (let row = 0; row < this.cellsY; row++) {
+      for (let col = 0; col < this.cellsY; col++) {
         this.highlighted[row][col] = false
       }
     }
@@ -146,18 +135,18 @@ class Game {
     this.isRunning = true
     this.runGameLoop()
   }
-  
+
   runGameLoop(newTime?: number) {
     if (!this.isRunning) {
       this.handleWin()
       return
     }
 
-    window.requestAnimationFrame(this.runGameLoop.bind(this)) 
+    window.requestAnimationFrame(this.runGameLoop.bind(this))
 
     const now = newTime;
     const timeElapsed = now - this.lastTime
-    
+
     if (timeElapsed > this.fpsInterval) {
 
       this.lastTime = now - (timeElapsed % this.fpsInterval);
@@ -166,7 +155,6 @@ class Game {
       this.drawBlocks()
       this.drawHighlight()
       this.animateDrop()
-      // this.clearDebug()
 
       if (this.winner) {
         this.isRunning = false
@@ -176,11 +164,11 @@ class Game {
 
   handleWin() {
     this.canAcceptInput = false
-    const winnerColor = this.colorFromPlayer(this.winner)    
+    const winnerColor = this.colorFromPlayer(this.winner)
 
-    document.body.style.cursor = "default";
-    this.context.font = "30px Arial";
-    this.context.fillStyle = 'black';
+    document.body.style.cursor = "default"
+    this.context.font = "30px Arial"
+    this.context.fillStyle = "black"
 
     const text = `${winnerColor} won!`
     const textMetrics = this.context.measureText(text)
@@ -192,7 +180,7 @@ class Game {
   }
 
   triggerAnimateDrop() {
-    document.body.style.cursor = "wait";
+    document.body.style.cursor = "wait"
     this.canAcceptInput = false
     this.animatingDrop = true
   }
@@ -203,38 +191,42 @@ class Game {
     this.grid[row][col] = player
     document.body.style.cursor = "default"
   }
-  
+
   animateDrop() {
     if (!this.lastDrop || !this.animatingDrop) return
 
     window.requestAnimationFrame(this.animateDrop.bind(this))
 
-    const {clickRow, clickCol, row, col, player} = this.lastDrop
+    const { clickRow, clickCol, row, col, player } = this.lastDrop
 
     if ((clickRow * this.cellSize) + this.dropAnimationY >= (this.cellSize * row)) {
       this.handleDropFinish(row, clickCol, player)
-      const won = checkPositionForWin(row, col, player, this.grid, false)
+      const won = checkPositionForWin(row, col, player, this.grid, this.debugGrid, this.debug)
+
+      if (this.debug) this.setClearDebugTimeout()
       if (won) {
+        if (this.debug) this.clearDebugGrid()
         this.winner = player
+        return
       }
       this.togglePlayer()
       this.canAcceptInput = true
     } else {
-      this.drawSpecificBlock(
+      this.drawBlockAtPoint(
         (clickCol * this.cellSize),
         (clickRow * this.cellSize) + this.dropAnimationY,
         this.colorFromPlayer(player)
       )
       this.dropAnimationY += d3.easePolyIn(1.2)
     }
-    
+
   }
 
-  drawSpecificBlock(x: number, y: number, color: string) {
+  drawBlockAtPoint(x: number, y: number, color: string) {
     this.context.fillStyle = color
     this.context.fillRect(x + 1, y + 1, this.cellSize - 1, this.cellSize - 1)
   }
-  
+
   drawBlock(row: number, col: number, color: string) {
     this.context.fillStyle = color
     this.context.fillRect((col * this.cellSize) + 1, (row * this.cellSize) + 1, this.cellSize - 1, this.cellSize - 1)
@@ -244,27 +236,28 @@ class Game {
     this.context.clearRect((col * this.cellSize) + 1, (row * this.cellSize) + 1, this.cellSize - 1, this.cellSize - 1)
   }
 
-  clearDebug() {
+  setClearDebugTimeout() {
     setTimeout(() => {
-      for (let row = 0; row < this.cellsY; row++) {
-        for (let col = 0; col < this.cellsY; col++) {
-          if (this.grid[row][col] == "X") {
-            this.grid[row][col] = null
-          }
-        }
+      this.clearDebugGrid()
+    }, 1000)
+  }
+  clearDebugGrid() {
+    for (let row = 0; row < this.cellsY; row++) {
+      for (let col = 0; col < this.cellsY; col++) {
+        this.debugGrid[row][col] = false
       }
-    }, 1200)
+    }
   }
 
   drawBlocks() {
     for (let row = 0; row < this.cellsY; row++) {
       for (let col = 0; col < this.cellsX; col++) {
-        if (this.grid[row][col] == "A") {
+        if (this.debugGrid[row][col]) {
+          this.drawBlock(row, col, 'green')
+        } else if (this.grid[row][col] == "A") {
           this.drawBlock(row, col, 'red')
         } else if (this.grid[row][col] == "B") {
           this.drawBlock(row, col, 'blue')
-        } else if (this.grid[row][col] == "X") {
-          this.drawBlock(row, col, 'green')
         } else {
           this.drawBlock(row, col, 'white')
         }
@@ -296,20 +289,18 @@ class Game {
       this.currentPlayer = "A"
     }
   }
-  
-  dropPiece(clickCol: number): {row: number, col: number} {
+
+  dropPiece(clickCol: number): { row: number, col: number } {
     for (let row = this.cellsY - 1; row >= 0; row--) {
       const cell = this.grid[row][clickCol]
       if (!cell) {
-        return {row, col: clickCol}
+        return { row, col: clickCol }
       }
     }
   }
 }
 
+setup.setupInterface()
 const game = new Game()
+setup.addEventListeners(game)
 game.startGame()
-
-btn.addEventListener('click', (e) => {
-  game.startGame()
-})

@@ -1,0 +1,16 @@
+#game {
+  -webkit-user-select: none;
+}
+.btn {
+  font-size: 1em;
+  background: white;
+  border: 1px solid black;
+  padding: 0.5em;
+  margin-right: 1em;
+  -webkit-user-select: none;
+}
+.btn.disabled {
+  background: #ccc;
+}
+
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly9zbmFrZS10eXBlc2NyaXB0Ly4vc3JjL3N0eWxlLmNzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNFLHlCQUF5QjtBQUMzQjtBQUNBO0VBQ0UsY0FBYztFQUNkLGlCQUFpQjtFQUNqQix1QkFBdUI7RUFDdkIsY0FBYztFQUNkLGlCQUFpQjtFQUNqQix5QkFBeUI7QUFDM0I7QUFDQTtFQUNFLGdCQUFnQjtBQUNsQixDIiwiZmlsZSI6Im1haW4uY3NzIiwic291cmNlc0NvbnRlbnQiOlsiI2dhbWUge1xuICAtd2Via2l0LXVzZXItc2VsZWN0OiBub25lO1xufVxuLmJ0biB7XG4gIGZvbnQtc2l6ZTogMWVtO1xuICBiYWNrZ3JvdW5kOiB3aGl0ZTtcbiAgYm9yZGVyOiAxcHggc29saWQgYmxhY2s7XG4gIHBhZGRpbmc6IDAuNWVtO1xuICBtYXJnaW4tcmlnaHQ6IDFlbTtcbiAgLXdlYmtpdC11c2VyLXNlbGVjdDogbm9uZTtcbn1cbi5idG4uZGlzYWJsZWQge1xuICBiYWNrZ3JvdW5kOiAjY2NjO1xufSJdLCJzb3VyY2VSb290IjoiIn0=*/
