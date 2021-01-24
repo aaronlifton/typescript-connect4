@@ -169,7 +169,7 @@ export default class Game {
       player,
     };
     this.sound.pause();
-    this.sound.currentTime = 0;
+    this.restartSound();
     this.triggerAnimateDrop();
   }
 
