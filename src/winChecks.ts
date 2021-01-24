@@ -141,10 +141,14 @@ export const checkPositionForWin = (
   debugBoard: DebugBoard,
   debug = false,
 ) => {
-  if (checkHoriz(row, col, player, board, boardSize, debugBoard, debug)) return true;
-  if (checkVert(row, col, player, board, boardSize, debugBoard, debug)) return true;
-  if (checkDiagLeft(row, col, player, board, boardSize, debugBoard, debug)) return true;
-  if (checkDiagRight(row, col, player, board, boardSize, debugBoard, debug)) return true;
+  if (checkHoriz(row, col, player, board, boardSize, debugBoard, debug))
+    return true;
+  if (checkVert(row, col, player, board, boardSize, debugBoard, debug))
+    return true;
+  if (checkDiagLeft(row, col, player, board, boardSize, debugBoard, debug))
+    return true;
+  if (checkDiagRight(row, col, player, board, boardSize, debugBoard, debug))
+    return true;
 
   return false;
 };
