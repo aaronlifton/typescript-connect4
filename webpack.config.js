@@ -17,12 +17,10 @@ module.exports = {
     port: 9000
   },
   resolve: {
-    // Add `.ts` and `.tsx` as a resolvable extension.
     extensions: [".ts", ".tsx", ".js"],
   },
   module: {
     rules: [
-      // all files with a `.ts` or `.tsx` extension will be handled by `ts-loader`
       { test: /\.tsx?$/, loader: "ts-loader" },
       { test: /\.css$/i, use: [MiniCssExtractPlugin.loader, "css-loader"] },
       {
@@ -40,6 +38,11 @@ module.exports = {
       filename: 'assets/index.html'
     }),
     new MiniCssExtractPlugin(),
-    new CopyWebpackPlugin({ patterns: [ { from: 'src/assets', to: 'assets'} ] })
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: 'src/assets/*.mp3', to: 'assets/[name].mp3'},
+        { from: 'src/assets/*.html', to: '[name].html'}
+      ]
+    })
   ],
 };

@@ -47,15 +47,15 @@ export default class Game {
   }
 
   setupDimensions() {
-    if (this.gridSize * (this.cellSize + 1) * this.scale > window.innerHeight) {
+    if (this.gridSize * this.cellSize * this.scale + 1 > window.innerHeight) {
       const height =
         window.innerHeight -
         document.getElementById("btnContainer").getBoundingClientRect().height;
-      this.cellSize = height / (this.scale * this.gridSize) + 1;
+      this.cellSize = height / (this.scale * this.gridSize) - 1;
       this.width = this.gridSize * this.cellSize;
       this.height = this.gridSize * this.cellSize;
     }
-    this.canvas.width = this.gridSize * (this.cellSize + 1) * this.scale;
+    this.canvas.width = this.gridSize * this.cellSize * this.scale + 1;
     this.canvas.height = this.canvas.width;
     this.context.scale(this.scale, this.scale);
     const container = this.canvas.parentElement as HTMLDivElement;
@@ -127,7 +127,6 @@ export default class Game {
     e: T,
     type: T extends MouseEvent ? "mouse" : "touch",
   ) {
-    console.log(e);
     if (!this.canAcceptInput) return;
 
     const { x, y } =
