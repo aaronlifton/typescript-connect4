@@ -1,5 +1,6 @@
 # Typescript Connect4
-- [https://codepen.io/aaronlifton/full/yLaWwqV](https://codepen.io/aaronlifton/full/yLaWwqV)
+- Demo: [https://aaronlifton.github.io/typescript-connect4/](https://aaronlifton.github.io/typescript-connect4/)
+
 # Dev
 1. `yarn && yarn run start:dev`
 
