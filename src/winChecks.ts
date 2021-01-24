@@ -23,6 +23,7 @@ const checkHoriz = (
   col: number,
   player: string,
   board: Board,
+  boardSize: number,
   debugBoard: DebugBoard,
   debug = false,
 ) => {
@@ -51,6 +52,7 @@ const checkVert = (
   col: number,
   player: string,
   board: Board,
+  boardSize: number,
   debugBoard: DebugBoard,
   debug = false,
 ) => {
@@ -79,6 +81,7 @@ const checkDiagRight = (
   col: number,
   player: string,
   board: Board,
+  boardSize: number,
   debugBoard: DebugBoard,
   debug = false,
 ) => {
@@ -106,12 +109,13 @@ const checkDiagLeft = (
   col: number,
   player: string,
   board: Board,
+  boardSize: number,
   debugBoard: DebugBoard,
   debug = false,
 ) => {
   let cells = [];
   for (let i = 3; i > 0; i--) {
-    if (row - i < 0 || col + i > 7) continue;
+    if (row - i < 0 || col + i > boardSize - 1) continue;
     const cell = board[row - i][col + i];
     if (debug) debugBoard[row - i][col + i] = true;
     if (!cell) break;
@@ -133,13 +137,14 @@ export const checkPositionForWin = (
   col: number,
   player: string,
   board: Board,
+  boardSize: number,
   debugBoard: DebugBoard,
   debug = false,
 ) => {
-  if (checkHoriz(row, col, player, board, debugBoard, debug)) return true;
-  if (checkVert(row, col, player, board, debugBoard, debug)) return true;
-  if (checkDiagLeft(row, col, player, board, debugBoard, debug)) return true;
-  if (checkDiagRight(row, col, player, board, debugBoard, debug)) return true;
+  if (checkHoriz(row, col, player, board, boardSize, debugBoard, debug)) return true;
+  if (checkVert(row, col, player, board, boardSize, debugBoard, debug)) return true;
+  if (checkDiagLeft(row, col, player, board, boardSize, debugBoard, debug)) return true;
+  if (checkDiagRight(row, col, player, board, boardSize, debugBoard, debug)) return true;
 
   return false;
 };

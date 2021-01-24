@@ -1,14 +1,31 @@
+:root {
+  touch-action: pan-x pan-y;
+  height: 100% 
+}
+
+body {
+  overflow: hidden;
+}
+#game-container {
+  text-align: center;
+}
 #game {
+  width: 100%;
   -webkit-user-select: none;
+  color: #333;
+  display: inline-block;
 }
 .btn {
   font-size: 1em;
   background: white;
-  border: 1px solid black;
+  border: 1px solid #666;
   padding: 0.5em;
   margin-right: 1em;
   -webkit-user-select: none;
+  outline: 0;
 }
 .btn.disabled {
-  background: #ccc;
+  color: #666;
+  border-color: #999;
+  background: #eee;
 }
