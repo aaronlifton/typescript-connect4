@@ -25,7 +25,8 @@
   },
   "scripts": {
     "build": "webpack",
-    "start:dev": "webpack serve"
+    "start:dev": "webpack serve",
+    "build:github": "webpack && ./build-github-page"
   },
   "dependencies": {
     "d3-ease": "^2.0.0"

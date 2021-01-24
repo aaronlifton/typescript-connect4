@@ -6,12 +6,12 @@ import "./style.css";
 export default class Game {
   private canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
-  private gridSize;
+  private gridSize: number;
   private cellSize = 60;
   private scale = 1.5;
   private gridColor = "#333333";
-  private width;
-  private height;
+  private width: number;
+  private height: number;
   private grid: Cell[][];
   private debugGrid: boolean[][];
   private highlighted: boolean[][];
@@ -41,12 +41,12 @@ export default class Game {
     this.canvas = document.getElementById("canvas") as HTMLCanvasElement;
     this.context = this.canvas.getContext("2d");
     this.setupDimensions();
-    this.lastTime = window.performance.now();
-
     this.setupAudio();
+
+    this.lastTime = window.performance.now();
   }
 
-  setupDimensions() {
+  private setupDimensions() {
     if (this.gridSize * this.cellSize * this.scale + 1 > window.innerHeight) {
       const height =
         window.innerHeight -
@@ -63,7 +63,22 @@ export default class Game {
     container.style.height = container.style.width;
   }
 
-  setupGrid() {
+  startGame() {
+    this.setupGrid();
+    this.registerHandlers();
+    this.winner = null;
+    this.lastDrop = null;
+    this.animatingDrop = false;
+    this.canAcceptInput = true;
+    this.isRunning = true;
+    this.runGameLoop();
+  }
+
+  toggleDebug() {
+    this.debug = !this.debug;
+  }
+
+  private setupGrid() {
     this.grid = [];
     this.highlighted = [];
     this.debugGrid = [];
@@ -181,11 +196,11 @@ export default class Game {
     }
   }
 
-  clearHighlights() {
+  private clearHighlights() {
     this.iterateOverCells((row, col) => (this.highlighted[row][col] = false));
   }
 
-  drawHighlight() {
+  private drawHighlight() {
     for (let row = 0; row < this.gridSize; row++) {
       for (let col = 0; col < this.gridSize; col++) {
         if (!!this.grid[row][col]) continue;
@@ -204,18 +219,7 @@ export default class Game {
     return player == "A" ? "Red" : "Blue";
   }
 
-  startGame() {
-    this.setupGrid();
-    this.registerHandlers();
-    this.winner = null;
-    this.lastDrop = null;
-    this.animatingDrop = false;
-    this.canAcceptInput = true;
-    this.isRunning = true;
-    this.runGameLoop();
-  }
-
-  runGameLoop(newTime?: number) {
+  private runGameLoop(newTime?: number) {
     if (!this.isRunning) {
       this.handleWin();
       return;
@@ -240,7 +244,7 @@ export default class Game {
     }
   }
 
-  handleWin() {
+  private handleWin() {
     this.canAcceptInput = false;
     const winnerColor = this.colorFromPlayer(this.winner);
 
@@ -257,12 +261,12 @@ export default class Game {
     );
   }
 
-  triggerAnimateDrop() {
+  private triggerAnimateDrop() {
     this.canAcceptInput = false;
     this.animatingDrop = true;
   }
 
-  animateDrop() {
+  private animateDrop() {
     if (!this.lastDrop || !this.animatingDrop) return;
 
     window.requestAnimationFrame(this.animateDrop.bind(this));
@@ -305,7 +309,7 @@ export default class Game {
     }
   }
 
-  drawBlockAtPoint(x: number, y: number, color: string) {
+  private drawBlockAtPoint(x: number, y: number, color: string) {
     this.context.fillStyle = color;
     this.context.fillRect(
       x + 1.0 / this.scale,
@@ -315,7 +319,7 @@ export default class Game {
     );
   }
 
-  drawBlock(row: number, col: number, color: string) {
+  private drawBlock(row: number, col: number, color: string) {
     this.context.fillStyle = color;
     this.context.fillRect(
       col * this.cellSize + 1.0 / this.scale,
@@ -325,7 +329,7 @@ export default class Game {
     );
   }
 
-  clearBlock(row: number, col: number) {
+  private clearBlock(row: number, col: number) {
     this.context.clearRect(
       col * this.cellSize + 1.0 / this.scale,
       row * this.cellSize + 1.0 / this.scale,
@@ -334,17 +338,17 @@ export default class Game {
     );
   }
 
-  setClearDebugTimeout() {
+  private setClearDebugTimeout() {
     setTimeout(() => {
       this.clearDebugGrid();
     }, 1000);
   }
 
-  clearDebugGrid() {
+  private clearDebugGrid() {
     this.iterateOverCells((row, col) => (this.debugGrid[row][col] = false));
   }
 
-  drawBlocks() {
+  private drawBlocks() {
     this.iterateOverCells((row, col) => {
       if (this.debugGrid[row][col]) {
         this.drawBlock(row, col, "green");
@@ -358,7 +362,7 @@ export default class Game {
     });
   }
 
-  drawGrid() {
+  private drawGrid() {
     this.context.strokeStyle = this.gridColor;
     for (let col = 0; col <= this.width; col += this.cellSize) {
       this.context.beginPath();
@@ -375,7 +379,7 @@ export default class Game {
     }
   }
 
-  togglePlayer() {
+  private togglePlayer() {
     if (this.currentPlayer == "A") {
       this.currentPlayer = "B";
     } else {
@@ -383,17 +387,13 @@ export default class Game {
     }
   }
 
-  dropPiece(clickCol: number): { row: number; col: number } {
+  private dropPiece(clickCol: number): { row: number; col: number } {
     for (let row = this.gridSize - 1; row >= 0; row--) {
       const cell = this.grid[row][clickCol];
       if (!cell) {
         return { row, col: clickCol };
       }
     }
-  }
-
-  toggleDebug() {
-    this.debug = !this.debug;
   }
 
   private setupAudio() {
