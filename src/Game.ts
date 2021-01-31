@@ -272,13 +272,13 @@ export default class Game {
   private animateDrop() {
     if (!this.lastDrop || !this.animatingDrop) return;
 
-    const ease = d3.easePolyIn(1.9);
+    const ease = d3.easePolyIn(2.0);
     const { clickedRow, clickedCol, row, col, player } = this.lastDrop;
     const minY = this.cellSize * row;
-    const dropFinished =
-      clickedRow * this.cellSize + this.dropAnimationY >= minY - ease;
+    const yOffset = clickedRow * this.cellSize + this.dropAnimationY
+    const dropFinished = yOffset + ease >= minY;
 
-    const drawBlock = (row, col, yOffset) =>
+    const drawBlock = (row: number, col: number, yOffset: number) =>
       this.drawBlockAtPoint(
         col * this.cellSize,
         row * this.cellSize + yOffset,
