@@ -16,3 +16,5 @@ logs
 
 .vscode/
 .vscode/*
+
+src/winChecks2.ts

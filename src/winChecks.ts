@@ -9,7 +9,7 @@ const checkForWin = (cells: string[], player: string) => {
     if (cells[i] == player) {
       count++;
       if (count == 4) {
-        console.log("won");
+        console.log(`${player} won`);
         return true;
       }
     } else {
@@ -33,14 +33,12 @@ const checkHoriz = (
     if (col - i < 0) continue;
     const cell = board[row][col - i];
     if (debug) debugBoard[row][col - i] = true;
-    if (!cell) break;
     cells.push(cell);
   }
   for (let i = 0; i < 4; i++) {
-    if (col + i > boardSize - 1) continue;
+    if (col + i > boardSize - 1) break;
     const cell = board[row][col + i];
     if (debug) debugBoard[row][col + i] = true;
-    if (!cell) break;
     cells.push(cell);
   }
 
@@ -62,14 +60,12 @@ const checkVert = (
     if (row - i < 0) continue;
     const cell = board[row - i][col];
     if (debug) debugBoard[row - i][col] = true;
-    if (!cell) break;
     cells.push(cell);
   }
   for (let i = 0; i < 4; i++) {
-    if (row + i > boardSize - 1) continue;
+    if (row + i > boardSize - 1) break;
     const cell = board[row + i][col];
     if (debug) debugBoard[row + i][col] = true;
-    if (!cell) break;
     cells.push(cell);
   }
 
@@ -90,14 +86,12 @@ const checkDiagRight = (
     if (row - i < 0 || col - i < 0) continue;
     const cell = board[row - i][col - i];
     if (debug) debugBoard[row - i][col - i] = true;
-    if (!cell) break;
     cells.push(cell);
   }
   for (let i = 0; i < 4; i++) {
-    if (row + i > boardSize - 1 || col + i > boardSize - 1) continue;
+    if (row + i > boardSize - 1 || col + i > boardSize - 1) break;
     const cell = board[row + i][col + i];
     if (debug) debugBoard[row + i][col + i] = true;
-    if (!cell) break;
     cells.push(cell);
   }
 
@@ -115,17 +109,17 @@ const checkDiagLeft = (
 ) => {
   let cells = [];
   for (let i = 3; i > 0; i--) {
-    if (row - i < 0 || col + i > boardSize - 1) continue;
+    if (row - i < 0 ) continue
+    if (col + i > boardSize - 1) break;
     const cell = board[row - i][col + i];
     if (debug) debugBoard[row - i][col + i] = true;
-    if (!cell) break;
     cells.push(cell);
   }
   for (let i = 0; i < 4; i++) {
-    if (row + i > boardSize - 1 || col - i < 0) continue;
+    if (row + i > boardSize - 1) break;
+    if (col - i < 0) continue;
     const cell = board[row + i][col - i];
     if (debug) debugBoard[row + i][col - i] = true;
-    if (!cell) break;
     cells.push(cell);
   }
 

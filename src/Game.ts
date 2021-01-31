@@ -19,12 +19,12 @@ export default class Game {
   private currentPlayer: Player = "A";
   private isRunning = false;
   private lastTime: number;
-  private fpsInterval = 20;
+  private fpsInterval = 5;
   private animatingDrop = false;
   private dropAnimationY = 0;
   private lastDrop: {
-    clickCol: number;
-    clickRow: number;
+    clickedCol: number;
+    clickedRow: number;
     row: number;
     col: number;
     player: Player;
@@ -176,9 +176,11 @@ export default class Game {
     if (typeof placedRow == "undefined" || typeof placedCol == "undefined")
       return;
 
+    if (this.grid[row][col]) return;
+
     this.lastDrop = {
-      clickRow: row,
-      clickCol: col,
+      clickedRow: row,
+      clickedCol: col,
       row: placedRow,
       col: placedCol,
       player,
@@ -233,6 +235,7 @@ export default class Game {
     if (timeElapsed > this.fpsInterval) {
       this.lastTime = now - (timeElapsed % this.fpsInterval);
 
+      this.clearScreen();
       this.drawGrid();
       this.drawBlocks();
       this.drawHighlight();
@@ -268,44 +271,52 @@ export default class Game {
 
   private animateDrop() {
     if (!this.lastDrop || !this.animatingDrop) return;
-
-    window.requestAnimationFrame(this.animateDrop.bind(this));
-
-    const { clickRow, clickCol, row, col, player } = this.lastDrop;
+    
+    const ease = d3.easePolyIn(1.9)
+    const { clickedRow, clickedCol, row, col, player } = this.lastDrop;
+    const minY = this.cellSize * row;
     const dropFinished =
-      clickRow * this.cellSize + this.dropAnimationY >= this.cellSize * row;
+      clickedRow * this.cellSize + this.dropAnimationY >= minY - ease;
 
-    if (dropFinished) {
-      this.grid[row][col] = player;
-      this.playSound();
-      const won = checkPositionForWin(
-        row,
-        col,
-        player,
-        this.grid,
-        this.gridSize,
-        this.debugGrid,
-        this.debug,
-      );
-      this.animatingDrop = false;
-      this.dropAnimationY = 0;
-
-      if (this.debug) this.setClearDebugTimeout();
-      if (won) {
-        if (this.debug) this.clearDebugGrid();
-        this.winner = player;
-      } else {
-        this.togglePlayer();
-        this.canAcceptInput = true;
-      }
-      this.runGameLoop();
-    } else {
+    const drawBlock = (row, col, yOffset) =>
       this.drawBlockAtPoint(
-        clickCol * this.cellSize,
-        clickRow * this.cellSize + this.dropAnimationY,
+        col * this.cellSize,
+        row * this.cellSize + yOffset,
         this.colorFromPlayer(player),
       );
-      this.dropAnimationY += d3.easePolyIn(1.2);
+      
+    if (dropFinished) {
+      drawBlock(row, col, 0)
+      this.afterDrop(row, col, player)
+    } else {
+      drawBlock(clickedRow, clickedCol, this.dropAnimationY)
+
+      this.dropAnimationY += ease;
+    }
+  }
+
+  private afterDrop(row: number, col: number, player: Player) {
+    this.grid[row][col] = player;
+    this.playSound();
+    this.animatingDrop = false;
+    this.dropAnimationY = 0;
+    const won = checkPositionForWin(
+      row,
+      col,
+      player,
+      this.grid,
+      this.gridSize,
+      this.debugGrid,
+      this.debug,
+    );
+
+    if (this.debug) this.setClearDebugTimeout();
+    if (won) {
+      if (this.debug) this.clearDebugGrid();
+      this.winner = player;
+    } else {
+      this.togglePlayer();
+      this.canAcceptInput = true;
     }
   }
 
@@ -350,16 +361,20 @@ export default class Game {
 
   private drawBlocks() {
     this.iterateOverCells((row, col) => {
+      const cell = this.grid[row][col];
+
       if (this.debugGrid[row][col]) {
         this.drawBlock(row, col, "green");
-      } else if (this.grid[row][col] == "A") {
+      } else if (cell == "A") {
         this.drawBlock(row, col, "red");
-      } else if (this.grid[row][col] == "B") {
+      } else if (cell == "B") {
         this.drawBlock(row, col, "blue");
-      } else {
-        this.drawBlock(row, col, "white");
       }
-    });
+    })
+  }
+
+  private clearScreen() {
+    this.context.clearRect(0, 0, this.width, this.height);
   }
 
   private drawGrid() {
@@ -387,11 +402,11 @@ export default class Game {
     }
   }
 
-  private dropPiece(clickCol: number): { row: number; col: number } {
+  private dropPiece(clickedCol: number): { row: number; col: number } {
     for (let row = this.gridSize - 1; row >= 0; row--) {
-      const cell = this.grid[row][clickCol];
+      const cell = this.grid[row][clickedCol];
       if (!cell) {
-        return { row, col: clickCol };
+        return { row, col: clickedCol };
       }
     }
   }
