@@ -271,8 +271,8 @@ export default class Game {
 
   private animateDrop() {
     if (!this.lastDrop || !this.animatingDrop) return;
-    
-    const ease = d3.easePolyIn(1.9)
+
+    const ease = d3.easePolyIn(1.9);
     const { clickedRow, clickedCol, row, col, player } = this.lastDrop;
     const minY = this.cellSize * row;
     const dropFinished =
@@ -284,12 +284,12 @@ export default class Game {
         row * this.cellSize + yOffset,
         this.colorFromPlayer(player),
       );
-      
+
     if (dropFinished) {
-      drawBlock(row, col, 0)
-      this.afterDrop(row, col, player)
+      drawBlock(row, col, 0);
+      this.afterDrop(row, col, player);
     } else {
-      drawBlock(clickedRow, clickedCol, this.dropAnimationY)
+      drawBlock(clickedRow, clickedCol, this.dropAnimationY);
 
       this.dropAnimationY += ease;
     }
@@ -370,7 +370,7 @@ export default class Game {
       } else if (cell == "B") {
         this.drawBlock(row, col, "blue");
       }
-    })
+    });
   }
 
   private clearScreen() {
