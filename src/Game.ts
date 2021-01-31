@@ -256,12 +256,21 @@ export default class Game {
 
     const text = `${winnerColor} won!`;
     const textMetrics = this.context.measureText(text);
-    this.context.fillText(
+    this.drawStrokeText(
       text,
       this.width / 2 - textMetrics.width / 2,
       this.height / 2 - textMetrics.actualBoundingBoxAscent / 2,
-      this.width,
     );
+  }
+
+  drawStrokeText(text: string, x: number, y: number) {
+    this.context.strokeStyle = "white";
+    const prevLineWidth = this.context.lineWidth;
+    this.context.lineWidth = 4;
+    this.context.strokeText(text, x, y);
+    this.context.fillStyle = "black";
+    this.context.fillText(text, x, y);
+    this.context.lineWidth = prevLineWidth;
   }
 
   private triggerAnimateDrop() {
@@ -272,7 +281,7 @@ export default class Game {
   private animateDrop() {
     if (!this.lastDrop || !this.animatingDrop) return;
 
-    const ease = d3.easePolyIn(2.0);
+    const ease = d3.easePolyIn(1.9);
     const { clickedRow, clickedCol, row, col, player } = this.lastDrop;
     const minY = this.cellSize * row;
     const yOffset = clickedRow * this.cellSize + this.dropAnimationY
